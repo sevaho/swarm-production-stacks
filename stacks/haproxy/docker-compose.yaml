@@ -1,0 +1,33 @@
+---
+version: "3.7"
+
+networks:
+  traefik-public:
+    external: true
+
+services:
+  haproxy:
+    image: haproxy:1.9-alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 350M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+    ports:
+      - "443:443"
+      - "80:80"
+    read_only: true
+    stdin_open: false
+    tty: false
+    volumes:
+      - type: "bind"
+        source: "./config/haproxy.cfg"
+        target: "/usr/local/etc/haproxy/haproxy.cfg"
+    networks:
+      - traefik-public
